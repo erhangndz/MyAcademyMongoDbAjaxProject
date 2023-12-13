@@ -21,7 +21,40 @@ namespace MyAcademyMongoDbAjaxProject.Controllers
 
         public IActionResult Index()
         {
+            var values = _productCollection.Find(category => true).ToList();
+            return View(values);
+        }
+
+        public IActionResult CreateProduct()
+        {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateProduct(Product product)
+        {
+            _productCollection.InsertOne(product);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult DeleteProduct(string id)
+        {
+            _productCollection.DeleteOne(x => x.ProductID == id);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult UpdateProduct(string id)
+        {
+            var value = _productCollection.Find(x => x.CategoryID == id).FirstOrDefault();
+            return View(value);
+
+        }
+
+        [HttpPost]
+        public IActionResult UpdateProduct(Product product)
+        {
+            _productCollection.FindOneAndReplace(x => x.ProductID == product.ProductID, product);
+            return RedirectToAction("Index");
         }
     }
 }

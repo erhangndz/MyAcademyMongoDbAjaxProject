@@ -1,0 +1,31 @@
+﻿@model List<Product>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h3>Ürünler</h3>
+
+@{
+    int count = 0;
+}
+<table class="table table-hover">
+    <tr>
+        <th>#</th>
+        <th>Ürün Adı</th>
+        <th></th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        count++;
+        <tr>
+            <th>@count</th>
+            <td>@item.ProductName</td>
+            <td>
+                <a asp-action="DeleteProduct" asp-route-id="@item.ProductID" class="btn btn-outline-danger">Sil</a>
+                <a asp-action="UpdateProduct" asp-route-id="@item.ProductID" class="btn btn-outline-info">Düzenle</a>
+            </td>
+        </tr>
+    }
+</table>
+<br />
+<a asp-action="CreateProduct" class="btn btn-outline-dark">Yeni Ürün Ekle</a>
