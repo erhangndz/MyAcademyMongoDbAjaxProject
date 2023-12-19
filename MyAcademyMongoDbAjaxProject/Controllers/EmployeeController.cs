@@ -35,6 +35,28 @@ namespace MyAcademyMongoDbAjaxProject.Controllers
             return Json(values);
         }
 
+        public async Task<IActionResult> GetEmployee(string employeeId)
+        {
+            var value = await _employeeCollection.Find(x => x.EmployeeId == employeeId).FirstOrDefaultAsync();
+            var jsonValue = JsonConvert.SerializeObject(value);
+            return Json(jsonValue);
+        }
+
+   
+        public async Task<IActionResult> DeleteEmployee(string id)
+        {
+           
+              var value=  await _employeeCollection.DeleteOneAsync(x=>x.EmployeeId==id);
+            return NoContent();
+         
+        }
+
+        public async Task<IActionResult> UpdateEmployee(Employee employee)
+        {
+            await _employeeCollection.FindOneAndReplaceAsync(x=>x.EmployeeId==employee.EmployeeId, employee);
+            return NoContent();
+        }
+
 
     }
 }

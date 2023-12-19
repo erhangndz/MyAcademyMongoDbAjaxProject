@@ -6,21 +6,24 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <h3>Personel İşlemleri (AJAX)</h3>
 
 <div class="container">
     <br />
     <h3>İşlemler</h3>
-    <button type="button" id="btnEmployeeList" class="btn btn-outline-primary">Personel Listesi</button>
    
-    <button type="button" id="btnEmployeeDelete" class="btn btn-outline-danger">Personel Sil</button>
-    <button type="button" id="btnEmployeeGet" class="btn btn-outline-dark">Personel Getir</button>
-    <button type="button" id="btnEmployeeUpdate" class="btn btn-outline-success">Personel Güncelle</button>
+   
+   
+   
+   
 </div>
 
 <br />
 <hr />
 <h3>Personel Listesi</h3>
+<button type="button" id="btnEmployeeList" class="btn btn-outline-primary">Personel Listesi</button>
 <div id="employeelist"></div>
 
 <hr />
@@ -36,6 +39,37 @@
     <button type="button" id="btnEmployeeCreate" class="btn btn-outline-info">Personel Ekle</button>
 </div>
 
+<hr />
+
+<h3>Personel Getirme Paneli</h3>
+<input type="text" placeholder="Getirmek istediğiniz personel ID" class="form-control" id="txtEmployeeId" />
+<br />
+<button type="button" id="btnEmployeeGet" class="btn btn-outline-dark">Personel Getir</button>
+<div id="employeeById"></div>
+
+<hr />
+
+<h3>Personel Silme</h3>
+<input type="text" placeholder="Silmek istediğiniz personel ID" class="form-control" id="txtDeleteId" />
+<br />
+<button type="button" id="btnEmployeeDelete" class="btn btn-outline-danger">Personel Sil</button>
+
+
+<hr />
+
+<div>
+    <h3>Personel Güncelleme</h3>
+    <input type="text" placeholder="Personel ID" class="form-control" id="txtupdateid" />
+    <br />
+    <input type="text" placeholder=" Adı" class="form-control" id="txtupdatename" />
+    <br />
+    <input type="text" placeholder=" Soyadı" class="form-control" id="txtupdatesurname" />
+    <br />
+    <input type="text" placeholder=" Maaş" class="form-control" id="txtupdatesalary" />
+    <br />
+    <button type="button" id="btnEmployeeUpdate" class="btn btn-outline-success">Personel Güncelle</button>
+</div>
+
 <script>
 
     $("#btnEmployeeList").click(function () {
@@ -48,31 +82,30 @@
                 let values = jQuery.parseJSON(func1);
                 console.log(values);
                 let tablehtml = `<table class='table table-bordered'>
-                    <tr>
-                    <th>Personel ID</th>
-                    <th>Personel Adı</th>
-                    <th>Personel Soyadı</th>
-                    <th>Personel Maaş</th>
-                    </tr>`
+                        <tr>
+                        <th>Personel ID</th>
+                        <th>Personel Adı</th>
+                        <th>Personel Soyadı</th>
+                        <th>Personel Maaş</th>
+                        </tr>`
                 $.each(values, (index, value) => {
                     tablehtml += `<tr>
-                     <td>${value.EmployeeId}</td>
-                     <td>${value.Name}</td>
-                     <td>${value.Surname}</td>
-                     <td>${value.Salary}</td>
-                     </tr>`
+                         <td>${value.EmployeeId}</td>
+                         <td>${value.Name}</td>
+                         <td>${value.Surname}</td>
+                         <td>${value.Salary}</td>
+                         </tr>`
                 });
                 tablehtml += `</table>`;
                 $("#employeelist").html(tablehtml);
-                
+
             }
 
 
         })
 
 
-    })
-
+    });
 
     $("#btnEmployeeCreate").click(function () {
         let employeevalues = {
@@ -86,12 +119,20 @@
         $.ajax({
 
 
-            type:"post",
-            url:"/Employee/CreateEmployee",
-            data:employeevalues,
+            type: "post",
+            url: "/Employee/CreateEmployee",
+            data: employeevalues,
             success: function (func2) {
                 let result = jQuery.parseJSON(func2);
-                alert("Personel Başarıyla Eklendi");
+                Swal.fire({
+
+                    title: 'Tebrikler!',
+                    text: 'Personel başarıyla eklendi',
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonText: 'Tamam',
+                    cancelButtonText: 'İptal'
+                });
 
 
                 $("#btnEmployeeList").click();
@@ -101,7 +142,103 @@
 
 
 
-    })
+    });
+
+    $("#btnEmployeeGet").click(function () {
+
+        let id = $("#txtEmployeeId").val();
+
+        $.ajax({
+            contentType: "application/json",
+            dataType: "json",
+            url: "/Employee/GetEmployee",
+            data: { employeeId: id },
+            success: function (func3) {
+                let result = jQuery.parseJSON(func3);
+                console.log(result);
+
+                let htmlstr = `
+                <table class='table table-hover'>
+                <tr>
+                <th>Personel ID</th>
+                <th>Personel Adı</th>
+                <th>Personel Soyadı</th>
+                <th>Personel Maaş</th>
+                </tr>
+
+                <tr>
+                <td>${result.EmployeeId}</td>
+                <td>${result.Name}</td>
+                <td>${result.Surname}</td>
+                <td>${result.Salary}</td>
+                </tr>
+
+                </table>
+                `;
+
+                $("#employeeById").html(htmlstr);
+
+            }
+        })
+    });
+
+    $("#btnEmployeeDelete").click(function () {
+
+        let id = $("#txtDeleteId").val();
+        $.ajax({
+            url: "/Employee/DeleteEmployee/" + id,
+            type: "Get",
+            contentType: "application/json",
+            success: function (func4) {
+                Swal.fire({
+
+                    title: 'Tebrikler!',
+                    text: 'Personel başarıyla silindi',
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonText: 'Tamam',
+                    cancelButtonText: 'İptal'
+                });
+
+                $("#btnEmployeeList").click();
+               
+            }
+
+                 
+        });
+
+    });
+
+    $("#btnEmployeeUpdate").click(function () {
+        let values = {
+            EmployeeID: $("#txtupdateid").val(),
+            Name: $("#txtupdatename").val(),
+            Surname: $("#txtupdatesurname").val(),
+            Salary: $("#txtupdatesalary").val()
+            
+        };
+
+        $.ajax({
+            type: "Post",
+            url: "/Employee/UpdateEmployee/",
+            data: values,
+            success: function (func5) {
+                Swal.fire({
+
+                    title: 'Tebrikler!',
+                    text: 'Personel başarıyla güncellendi',
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonText: 'Tamam',
+                    cancelButtonText: 'İptal'
+                });
+
+                $("#btnEmployeeList").click();
+            }
+        });
+
+
+    });
 
 
 </script>
